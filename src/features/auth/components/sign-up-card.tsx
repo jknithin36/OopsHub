@@ -4,7 +4,6 @@ import { FaGithub } from "react-icons/fa";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
@@ -16,21 +15,29 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { registerSchema } from "../schemas";
+import { useRegister } from "../api/use-register";
+import { z } from "zod";
 
-const formSchema = z.object({
-  fullName: z.string().min(1, { message: "Full name is required" }),
-  email: z.string().email({ message: "Enter a valid email" }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters" }),
-});
+// const formSchema = z.object({
+//   fullName: z.string().min(1, { message: "Full name is required" }),
+//   email: z.string().email({ message: "Enter a valid email" }),
+//   password: z
+//     .string()
+//     .min(8, { message: "Password must be at least 8 characters" }),
+// });
 
 export function SignUpCard() {
+  const { mutate } = useRegister();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: { fullName: "", email: "", password: "" },
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: "", email: "", password: "" },
   });
+
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
+    mutate({ json: values });
+  };
 
   return (
     <div className="w-full max-w-xl bg-white dark:bg-neutral-900 shadow-sm border border-gray-200 dark:border-neutral-800 rounded-2xl p-8 sm:p-10">
@@ -44,9 +51,9 @@ export function SignUpCard() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(console.log)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
-            name="fullName"
+            name="name"
             control={form.control}
             render={({ field }) => (
               <FormItem>

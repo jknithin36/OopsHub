@@ -1,5 +1,5 @@
 "use client";
-import { SignUpCard } from "@/features/components/sign-up-card";
+import { SignUpCard } from "@/features/auth/components/sign-up-card";
 import React from "react";
 
 const SignUPPage = () => {
@@ -15,7 +15,5 @@ export default SignUPPage;
 // page.tsx should be default export
 
 // () --> ROute Groups
-
-
 
 //
