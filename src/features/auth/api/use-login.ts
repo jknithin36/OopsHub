@@ -11,7 +11,7 @@ export const useLogin = () => {
       const response = await client.api.auth.login.$post({ json });
 
       if (!response.ok) throw new Error("Login failed");
-      return response.json();
+      return await response.json();
     },
   });
 
