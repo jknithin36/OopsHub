@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,21 +21,14 @@ import { registerSchema } from "../schemas";
 import { useRegister } from "../api/use-register";
 import { z } from "zod";
 
-// const formSchema = z.object({
-//   fullName: z.string().min(1, { message: "Full name is required" }),
-//   email: z.string().email({ message: "Enter a valid email" }),
-//   password: z
-//     .string()
-//     .min(8, { message: "Password must be at least 8 characters" }),
-// });
-
 export function SignUpCard() {
-  const { mutate } = useRegister();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: "", email: "", password: "" },
   });
+
+  const { mutate, isPending } = useRegister();
 
   const onSubmit = (values: z.infer<typeof registerSchema>) => {
     mutate({ json: values });
@@ -117,8 +112,16 @@ export function SignUpCard() {
             )}
           />
 
-          <Button type="submit" className="w-full h-11 text-sm">
-            Sign Up
+          <Button
+            type="submit"
+            className="w-full h-11 text-sm"
+            disabled={isPending}
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </form>
       </Form>

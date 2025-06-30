@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,20 +21,14 @@ import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
 import { z } from "zod";
 
-// const signInSchema = z.object({
-//   email: z.string().email({ message: "Enter a valid email" }),
-//   password: z
-//     .string()
-//     .min(8, { message: "Password must be at least 8 characters" }),
-// });
-
 export function SignInCard() {
-  const { mutate } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
+
+  const { mutate, isPending } = useLogin();
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     mutate({ json: values });
@@ -99,8 +95,16 @@ export function SignInCard() {
             )}
           />
 
-          <Button type="submit" className="w-full h-11 text-sm">
-            Sign In
+          <Button
+            type="submit"
+            className="w-full h-11 text-sm"
+            disabled={isPending}
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </form>
       </Form>
