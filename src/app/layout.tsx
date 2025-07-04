@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 
 import { QueryProvider } from "@/components/query-provider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,6 @@ export const metadata: Metadata = {
     "project management",
     "workspace",
     "team collaboration",
-    "Jira clone",
   ],
   authors: [
     { name: "OopsHub Team", url: "https://www.linkedin.com/in/jknithin/" },
@@ -50,7 +50,10 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={cn(inter.className, "antialiased min-h-screen")}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <Toaster />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
