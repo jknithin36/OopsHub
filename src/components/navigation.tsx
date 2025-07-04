@@ -41,7 +41,7 @@ export const Navigation = () => {
   const pathname = usePathname();
 
   return (
-    <ul className="flex flex-col gap-1">
+    <ul className="flex flex-col space-y-1">
       {routes.map((item) => {
         const isActive = pathname === item.href;
         const Icon = isActive ? item.activeIcon : item.icon;
@@ -51,13 +51,23 @@ export const Navigation = () => {
             <Link
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all",
                 isActive
-                  ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
-                  : "text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  ? "bg-muted text-foreground dark:bg-neutral-800"
+                  : "text-muted-foreground hover:bg-muted/60 dark:hover:bg-muted/20"
               )}
             >
-              <Icon className="w-5 h-5 shrink-0" />
+              {/* 🔵 Left Indicator */}
+              {isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1.5 rounded-r bg-blue-600" />
+              )}
+
+              <Icon
+                className={cn(
+                  "w-5 h-5 transition",
+                  isActive && "text-blue-600"
+                )}
+              />
               <span>{item.label}</span>
             </Link>
           </li>
