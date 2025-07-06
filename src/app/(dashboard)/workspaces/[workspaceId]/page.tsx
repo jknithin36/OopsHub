@@ -1,6 +1,14 @@
+import { getCurrent } from "@/features/auth/actions";
+import { redirect } from "next/navigation";
 import React from "react";
 
-const WorkSpaceId = () => {
+const WorkSpaceId = async () => {
+  // const user = await getCurrent();
+
+  // if (user) redirect("/");
+
+  const user = await getCurrent();
+  if (!user) redirect("/");
   return <div>WorkSpaceId</div>;
 };
 
