@@ -56,17 +56,36 @@
 // export default app;
 import { Hono } from "hono";
 import { sessionMiddleware } from "@/lib/session-middleware";
-import { DATABASE_ID, IMAGES_BUCKET_ID, WORKSPACES_ID } from "@/config";
-import { ID } from "node-appwrite";
+import {
+  DATABASE_ID,
+  IMAGES_BUCKET_ID,
+  MEMBERS_ID,
+  WORKSPACES_ID,
+} from "@/config";
+import { ID, Permission, Query, Role } from "node-appwrite";
+import { MemberRole } from "@/features/members/types";
+import { generateInviteCode } from "@/lib/utils";
 
 const app = new Hono();
 
 app
   .get("/", sessionMiddleware, async (c) => {
+    const user = c.get("user");
     const databases = c.get("databases");
+
+    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      Query.equal("userId", user.$id),
+    ]);
+
+    if (members.total === 0) {
+      return c.json({ data: { documents: [], total: 0 } });
+    }
+
+    const workspaceIds = members.documents.map((member) => member.workspaceId);
     const workspaces = await databases.listDocuments(
       DATABASE_ID,
-      WORKSPACES_ID
+      WORKSPACES_ID,
+      [Query.orderDesc("$createdAt"), Query.contains("$id", workspaceIds)]
     );
 
     return c.json({ data: workspaces });
@@ -90,17 +109,17 @@ app
     }
 
     const databases = c.get("databases");
-    const user = c.get("user");
     const storage = c.get("storage");
+    const user = c.get("user");
 
     let uploadedImageUrl: string | null = null;
-
+    const inviteCode: string = generateInviteCode(7);
     if (file instanceof File) {
       const result = await storage.createFile(
         IMAGES_BUCKET_ID,
         ID.unique(),
         file,
-        [Permission.read(Role.any())] // ✅ This is where public read access goes
+        [Permission.read(Role.any())]
       );
       uploadedImageUrl = result?.$id || null;
     }
@@ -113,11 +132,18 @@ app
         name,
         userId: user.$id,
         imageUrl: uploadedImageUrl,
+        inviteCode,
       },
       [Permission.read(Role.any()), Permission.update(`user:${user.$id}`)]
     );
 
+    // ✅ Add logged-in user to the members collection
+    await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
+      userId: user.$id,
+      workspaceId: workspace.$id,
+      role: MemberRole.ADMIN, // Will be "ADMIN"
+    });
+
     return c.json({ success: true, data: workspace });
   });
-
 export default app;

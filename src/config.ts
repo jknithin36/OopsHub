@@ -6,3 +6,5 @@ export const APPWRITE_KEY = process.env.NEXT_APPWRITE_KEY!;
 
 export const IMAGES_BUCKET_ID =
   process.env.NEXT_PUBLIC_APPWRITE_IMAGES_BUCKET_ID;
+
+export const MEMBERS_ID = process.env.NEXT_PUBLIC_APPWRITE_MEMBERS_ID;

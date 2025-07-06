@@ -1,92 +1,85 @@
 "use client";
 
 import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { RiAddCircleFill } from "react-icons/ri";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Check, Plus } from "lucide-react";
-import { useState } from "react";
-import { getImageUrl } from "@/lib/get-image-url";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { WorkSpaceAvatar } from "@/features/workspaces/components/workspace-avatar";
+import { useRouter } from "next/navigation";
+import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
-const WorkSpaceSwitcher = () => {
-  const { data, isLoading, isError } = useGetWorkspaces();
-  const [selected, setSelected] = useState<any>(null);
+const WorkSpace = () => {
+  const workspaceId = useWorkSpaceId();
+  const router = useRouter();
+  const { data: workspaces, isLoading } = useGetWorkspaces();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError || !data) return <div>Error loading workspaces</div>;
+  const hasWorkspaces = workspaces?.documents?.length > 0;
 
-  const workspaces = data.documents;
-  const current = selected || workspaces[0];
+  const current =
+    workspaces?.documents?.find((w) => w.$id === workspaceId) ||
+    workspaces?.documents?.[0];
 
-  if (!workspaces.length) {
-    return (
-      <Button variant="outline" className="gap-2">
-        <Plus className="h-4 w-4" />
-        Add Workspace
-      </Button>
-    );
-  }
+  const onSelect = (id: string) => {
+    router.push(`/workspaces/${id}`);
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className="flex items-center gap-2 px-3 py-2 rounded-2xl shadow-sm"
-        >
-          <Avatar className="h-6 w-6">
-            <AvatarImage
-              src={getImageUrl(current.imageUrl)}
-              alt={current.name}
-              className="object-cover"
-            />
-            <AvatarFallback className="text-xs font-bold">
-              {current.name?.[0]?.toUpperCase() ?? "W"}
-            </AvatarFallback>
-          </Avatar>
-          <span className="truncate">{current.name}</span>
-        </Button>
-      </DropdownMenuTrigger>
+    <div className="flex flex-col gap-y-2">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase text-muted-foreground tracking-wide">
+          Workspaces
+        </p>
+        <RiAddCircleFill
+          className="size-5 text-muted-foreground hover:text-primary transition cursor-pointer"
+          title="Create Workspace"
+        />
+      </div>
 
-      <DropdownMenuContent className="w-60 mt-2">
-        {workspaces.map((workspace) => {
-          const isActive = workspace.$id === current.$id;
-          return (
-            <DropdownMenuItem
-              key={workspace.$id}
-              onClick={() => setSelected(workspace)}
-              className={`flex gap-3 items-center py-2 px-3 rounded-xl transition-all cursor-pointer ${
-                isActive ? "bg-muted font-semibold" : "hover:bg-accent"
-              }`}
-            >
-              <Avatar className="h-6 w-6">
-                <AvatarImage
-                  src={getImageUrl(workspace.imageUrl)}
-                  alt={workspace.name}
-                  className="object-cover"
-                />
-                <AvatarFallback className="text-xs font-bold">
-                  {workspace.name?.[0]?.toUpperCase() ?? "W"}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm flex-1">{workspace.name}</span>
-              {isActive && <Check className="h-4 w-4 text-muted-foreground" />}
-            </DropdownMenuItem>
-          );
-        })}
-
-        <DropdownMenuItem className="flex gap-2 items-center text-muted-foreground mt-2">
-          <Plus className="h-4 w-4" />
-          <span>Add Workspace</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      {/* Selector */}
+      <Select onValueChange={onSelect} value={current?.$id}>
+        <SelectTrigger className="bg-neutral-100 hover:bg-neutral-200 text-sm px-3 py-2 rounded-md border border-neutral-300 focus:ring-2 focus:ring-primary focus:outline-none transition w-full">
+          <SelectValue
+            placeholder={
+              isLoading
+                ? "Loading..."
+                : hasWorkspaces
+                ? current?.name
+                : "No workspaces"
+            }
+          />
+        </SelectTrigger>
+        <SelectContent className="bg-white border border-neutral-300 rounded-md shadow-md max-h-60 overflow-y-auto">
+          {hasWorkspaces ? (
+            workspaces.documents.map((workspace) => (
+              <SelectItem
+                key={workspace.$id}
+                value={workspace.$id}
+                className="text-sm px-3 py-2 cursor-pointer hover:bg-neutral-100"
+              >
+                <div className="flex items-center gap-2 truncate font-medium">
+                  <WorkSpaceAvatar
+                    name={workspace.name}
+                    image={workspace.imageUrl}
+                  />
+                  <span className="truncate">{workspace.name}</span>
+                </div>
+              </SelectItem>
+            ))
+          ) : (
+            <div className="text-xs text-muted-foreground px-3 py-2">
+              No workspaces found
+            </div>
+          )}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
 
-export default WorkSpaceSwitcher;
+export default WorkSpace;
