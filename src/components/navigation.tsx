@@ -10,6 +10,8 @@ import { FiSettings } from "react-icons/fi";
 import { IoSettingsSharp } from "react-icons/io5";
 import { PiUsersThreeLight, PiUsersThreeFill } from "react-icons/pi";
 
+import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
+
 const routes = [
   {
     label: "Home",
@@ -38,18 +40,20 @@ const routes = [
 ];
 
 export const Navigation = () => {
+  const workspaceId = useWorkSpaceId();
   const pathname = usePathname();
 
   return (
     <ul className="flex flex-col space-y-1">
       {routes.map((item) => {
-        const isActive = pathname === item.href;
+        const fullHref = `/workspaces/${workspaceId}${item.href}`;
+        const isActive = pathname === fullHref;
         const Icon = isActive ? item.activeIcon : item.icon;
 
         return (
           <li key={item.href}>
             <Link
-              href={item.href}
+              href={fullHref}
               className={cn(
                 "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all",
                 isActive
