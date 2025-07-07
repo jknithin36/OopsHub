@@ -1,5 +1,5 @@
 // app/workspaces/create/page.tsx
-import { getCurrent } from "@/features/auth/actions";
+import { getCurrent } from "@/features/auth/queries";
 import { NewWorkSpace } from "@/features/workspaces/components/new-workspace";
 import { redirect } from "next/navigation";
 
