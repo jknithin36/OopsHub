@@ -12,6 +12,7 @@ export const DeleteWorkspaceCard = () => {
   const { workspaceId } = useParams();
   const router = useRouter();
   const deleteMutation = useDeleteWorkspace();
+
   const [ConfirmDialog, confirm] = useConfirm(
     "Are you sure you want to delete this?",
     "This action will permanently delete the content and cannot be undone.",
@@ -19,8 +20,6 @@ export const DeleteWorkspaceCard = () => {
       confirmText: "Delete",
       confirmVariant: "destructive",
       icon: <Trash2 className="w-5 h-5 text-destructive mt-1" />,
-      extraDescription:
-        "Once deleted, this item is gone forever and cannot be recovered.",
     }
   );
 
@@ -40,13 +39,13 @@ export const DeleteWorkspaceCard = () => {
   return (
     <>
       <ConfirmDialog />
-      <Card className="border border-red-300 bg-red-50/50 rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-lg text-red-600 font-semibold">
+      <Card className="bg-white border rounded-xl shadow-sm p-6 space-y-4">
+        <CardHeader className="p-0">
+          <CardTitle className="text-base font-medium text-destructive">
             Danger Zone
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-0 space-y-4">
           <p className="text-sm text-muted-foreground">
             This action is irreversible. Please confirm before continuing.
           </p>

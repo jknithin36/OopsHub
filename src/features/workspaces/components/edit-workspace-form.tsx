@@ -1,3 +1,4 @@
+// ✅ UpdateWorkspaceForm.tsx
 "use client";
 
 import { useRef, useState, useEffect } from "react";
@@ -37,7 +38,6 @@ export const UpdateWorkspaceForm = ({
   const { workspaceId } = useParams();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,17 +46,12 @@ export const UpdateWorkspaceForm = ({
   }, [workspace.imageUrl]);
 
   const updateMutation = useUpdateWorkspace(workspaceId as string);
-
   const form = useForm<FormValues>({ defaultValues: { name: workspace.name } });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (file.size > 1024 * 1024) {
-      toast.error("Image must be under 1MB.");
-      return;
-    }
+    if (file.size > 1024 * 1024) return toast.error("Image must be under 1MB.");
 
     form.setValue("image", file);
     setImagePreview(URL.createObjectURL(file));
@@ -81,8 +76,8 @@ export const UpdateWorkspaceForm = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-background p-8 rounded-2xl border border-border shadow-sm">
-      <h2 className="text-xl font-semibold mb-6 text-foreground">
+    <div className="bg-white border rounded-xl shadow-sm p-6 space-y-6">
+      <h2 className="text-base font-medium text-muted-foreground">
         Workspace Details
       </h2>
       <Form {...form}>
@@ -112,12 +107,12 @@ export const UpdateWorkspaceForm = ({
             render={() => (
               <FormItem>
                 <FormLabel>Workspace Logo</FormLabel>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <Avatar className="w-14 h-14 rounded-full border">
                     {imagePreview ? (
                       <AvatarImage src={imagePreview} alt="Preview" />
                     ) : (
-                      <AvatarFallback className="bg-muted text-muted-foreground font-medium text-base">
+                      <AvatarFallback>
                         {workspace.name[0].toUpperCase()}
                       </AvatarFallback>
                     )}
@@ -128,7 +123,7 @@ export const UpdateWorkspaceForm = ({
                       accept="image/*"
                       ref={inputRef}
                       onChange={handleFileChange}
-                      className="block text-sm text-muted-foreground file:bg-muted file:rounded-md file:px-3 file:py-1 file:border-none file:text-sm file:font-medium file:cursor-pointer"
+                      className="text-sm text-muted-foreground"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       Max 1MB. Square images preferred.
@@ -139,7 +134,7 @@ export const UpdateWorkspaceForm = ({
             )}
           />
 
-          <div className="flex justify-end gap-3 pt-6">
+          <div className="flex justify-end gap-2 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -148,15 +143,10 @@ export const UpdateWorkspaceForm = ({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={updateMutation.isPending}
-              className="bg-primary text-white hover:bg-primary/90"
-            >
+            <Button type="submit" disabled={updateMutation.isPending}>
               {updateMutation.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Updating...
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" /> Updating...
                 </>
               ) : (
                 "Update Workspace"
