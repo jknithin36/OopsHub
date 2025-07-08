@@ -1,8 +1,6 @@
-// layouts/stand-alone-layout.tsx
 "use client";
 
 import { UserButton } from "@/features/auth/components/user-button";
-import { WorkspaceModalProvider } from "@/features/workspaces/hooks/use-create-workspace-modal";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -31,9 +29,7 @@ const StandAloneLayout = ({ children }: StandAloneLayoutProps) => {
       </header>
 
       {/* Main Content */}
-      <section className="flex-grow">
-        <WorkspaceModalProvider>{children}</WorkspaceModalProvider>
-      </section>
+      <section className="flex-grow">{children}</section>
     </main>
   );
 };
