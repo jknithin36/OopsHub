@@ -18,7 +18,7 @@ import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { Workspace } from "../types";
-import { getImageUrl } from "@/lib/get-image-url"; // ✅ your image helper
+import { getImageUrl } from "@/lib/get-image-url";
 
 interface UpdateWorkspaceFormProps {
   workspace: Workspace;
@@ -40,7 +40,6 @@ export const UpdateWorkspaceForm = ({
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // ✅ Load existing image using getImageUrl helper
   useEffect(() => {
     const url = getImageUrl(workspace.imageUrl);
     setImagePreview(url);
@@ -48,11 +47,7 @@ export const UpdateWorkspaceForm = ({
 
   const updateMutation = useUpdateWorkspace(workspaceId as string);
 
-  const form = useForm<FormValues>({
-    defaultValues: {
-      name: workspace.name,
-    },
-  });
+  const form = useForm<FormValues>({ defaultValues: { name: workspace.name } });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,15 +59,13 @@ export const UpdateWorkspaceForm = ({
     }
 
     form.setValue("image", file);
-    setImagePreview(URL.createObjectURL(file)); // show selected preview
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const onSubmit = (values: FormValues) => {
     const formData = new FormData();
     formData.append("name", values.name);
-    if (values.image instanceof File) {
-      formData.append("image", values.image);
-    }
+    if (values.image instanceof File) formData.append("image", values.image);
 
     updateMutation.mutate(
       { formData },
@@ -80,21 +73,20 @@ export const UpdateWorkspaceForm = ({
         onSuccess: () => {
           toast.success("Workspace updated!");
           onSuccess?.();
-          router.push(`/workspaces/${workspaceId}`); // ✅ navigate back
+          router.push(`/workspaces/${workspaceId}`);
         },
-        onError: (error) => {
-          toast.error(error.message);
-        },
+        onError: (error) => toast.error(error.message),
       }
     );
   };
 
   return (
-    <div className="w-full max-w-xl bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
-      <h2 className="text-xl font-semibold mb-6">Update Workspace</h2>
+    <div className="w-full max-w-2xl mx-auto bg-background p-8 rounded-2xl border border-border shadow-sm">
+      <h2 className="text-xl font-semibold mb-6 text-foreground">
+        Workspace Details
+      </h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Workspace Name */}
           <FormField
             control={form.control}
             name="name"
@@ -105,7 +97,7 @@ export const UpdateWorkspaceForm = ({
                 <FormControl>
                   <Input
                     placeholder="Enter workspace name"
-                    className="bg-white border border-gray-300"
+                    className="bg-background border"
                     {...field}
                   />
                 </FormControl>
@@ -114,7 +106,6 @@ export const UpdateWorkspaceForm = ({
             )}
           />
 
-          {/* Image Upload */}
           <FormField
             control={form.control}
             name="image"
@@ -122,47 +113,45 @@ export const UpdateWorkspaceForm = ({
               <FormItem>
                 <FormLabel>Workspace Logo</FormLabel>
                 <div className="flex items-center gap-4">
-                  <Avatar className="w-14 h-14 rounded-md border overflow-hidden">
+                  <Avatar className="w-14 h-14 rounded-full border">
                     {imagePreview ? (
-                      <AvatarImage
-                        src={imagePreview}
-                        alt="Preview"
-                        className="object-cover w-full h-full"
-                      />
+                      <AvatarImage src={imagePreview} alt="Preview" />
                     ) : (
-                      <AvatarFallback className="bg-gray-200 text-gray-500">
-                        Logo
+                      <AvatarFallback className="bg-muted text-muted-foreground font-medium text-base">
+                        {workspace.name[0].toUpperCase()}
                       </AvatarFallback>
                     )}
                   </Avatar>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={inputRef}
-                    onChange={handleFileChange}
-                    className="text-sm text-gray-600"
-                  />
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={inputRef}
+                      onChange={handleFileChange}
+                      className="block text-sm text-muted-foreground file:bg-muted file:rounded-md file:px-3 file:py-1 file:border-none file:text-sm file:font-medium file:cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Max 1MB. Square images preferred.
+                    </p>
+                  </div>
                 </div>
-                <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Buttons */}
-          <div className="flex justify-between items-center pt-2 gap-2">
+          <div className="flex justify-end gap-3 pt-6">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.push(`/workspaces/${workspaceId}`)}
               disabled={updateMutation.isPending}
             >
-              Go Back
+              Cancel
             </Button>
-
             <Button
               type="submit"
               disabled={updateMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary text-white hover:bg-primary/90"
             >
               {updateMutation.isPending ? (
                 <>

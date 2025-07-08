@@ -137,6 +137,36 @@ app
     );
 
     return c.json({ data: workspace });
+  })
+  .delete("/:workspaceId", sessionMiddleware, async (c) => {
+    try {
+      const databases = c.get("databases");
+      const user = c.get("user");
+      const workspaceId = c.req.param("workspaceId");
+
+      if (!workspaceId) {
+        return c.json({ error: "Missing workspace ID" }, 400);
+      }
+
+      const member = await getMember({
+        databases,
+        workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({ error: "Unauthorized" }, 403);
+      }
+
+      await databases.deleteDocument(DATABASE_ID, WORKSPACES_ID, workspaceId);
+
+      return c.json({ data: { $id: workspaceId } });
+    } catch (error: any) {
+      return c.json(
+        { error: error.message || "Failed to delete workspace" },
+        500
+      );
+    }
   });
 
 export default app;
