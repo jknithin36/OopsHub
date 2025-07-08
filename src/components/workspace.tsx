@@ -1,3 +1,4 @@
+// app/components/sidebar-workspace-selector.tsx
 "use client";
 
 import { useWorkspaceModal } from "@/features/workspaces/hooks/use-create-workspace-modal";
@@ -14,13 +15,16 @@ import { WorkSpaceAvatar } from "@/features/workspaces/components/workspace-avat
 import { useRouter } from "next/navigation";
 import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
-const WorkSpace = () => {
+const SidebarWorkSpaceSelector = () => {
   const { open } = useWorkspaceModal();
   const { data: workspaces, isLoading } = useGetWorkspaces();
   const workspaceId = useWorkSpaceId();
   const router = useRouter();
 
   const hasWorkspaces = workspaces?.documents?.length > 0;
+  const current =
+    workspaces?.documents?.find((w) => w.$id === workspaceId) ||
+    workspaces?.documents?.[0];
 
   return (
     <div className="flex flex-col gap-y-2">
@@ -34,14 +38,17 @@ const WorkSpace = () => {
         />
       </div>
 
-      <Select onValueChange={(id) => router.push(`/workspaces/${id}`)}>
-        <SelectTrigger>
+      <Select
+        onValueChange={(id) => router.push(`/workspaces/${id}`)}
+        value={current?.$id}
+      >
+        <SelectTrigger className="w-full">
           <SelectValue
             placeholder={
               isLoading
                 ? "Loading..."
                 : hasWorkspaces
-                ? "Select workspace"
+                ? current?.name
                 : "No workspaces"
             }
           />
@@ -65,4 +72,4 @@ const WorkSpace = () => {
   );
 };
 
-export default WorkSpace;
+export default SidebarWorkSpaceSelector;

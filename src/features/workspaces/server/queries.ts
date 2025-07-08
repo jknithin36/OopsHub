@@ -63,3 +63,25 @@ export const getWorkspaceById = async ({
     return null;
   }
 };
+
+export const getWorkSpaceInfo = async (workspaceId: string) => {
+  try {
+    const { databases } = await createSessionClient();
+
+    const workspace = await databases.getDocument(
+      DATABASE_ID,
+      WORKSPACES_ID,
+      workspaceId
+    );
+
+    return {
+      id: workspace.$id,
+      name: workspace.name,
+      imageUrl: workspace.imageUrl,
+      inviteCode: workspace.inviteCode,
+    };
+  } catch (error) {
+    console.error("Failed to fetch workspace info:", error);
+    return null;
+  }
+};

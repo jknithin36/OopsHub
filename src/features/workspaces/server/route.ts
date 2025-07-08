@@ -10,6 +10,9 @@ import { ID, Permission, Role, Query } from "node-appwrite";
 import { MemberRole } from "@/features/members/types";
 import { generateInviteCode } from "@/lib/utils";
 import { getMember } from "@/features/members/utils";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
+import { use } from "react";
 
 const app = new Hono();
 
@@ -168,15 +171,16 @@ app
       );
     }
   })
-  .post("/:workspaceId/reset-invite-code", sessionMiddleware, async (c) => {
-    try {
+  .post(
+    "/:workspaceId/join",
+    sessionMiddleware,
+    zValidator("json", z.object({ code: z.string() })),
+    async (c) => {
+      const workspaceId = c.req.param("workspaceId");
+      const { code } = c.req.valid("json");
+
       const databases = c.get("databases");
       const user = c.get("user");
-      const workspaceId = c.req.param("workspaceId");
-
-      if (!workspaceId) {
-        return c.json({ error: "Missing workspace ID" }, 400);
-      }
 
       const member = await getMember({
         databases,
@@ -184,28 +188,28 @@ app
         userId: user.$id,
       });
 
-      if (!member || member.role !== MemberRole.ADMIN) {
-        return c.json({ error: "Unauthorized" }, 403);
+      if (member) {
+        return c.json({ error: "Already a member" }, 400);
       }
 
-      const updated = await databases.updateDocument(
+      const workspace = await databases.getDocument(
         DATABASE_ID,
         WORKSPACES_ID,
-        workspaceId,
-        {
-          inviteCode: generateInviteCode(7),
-        }
+        workspaceId
       );
 
-      return c.json({ data: updated });
-    } catch (error: any) {
-      return c.json(
-        {
-          error: error.message || "Failed to reset invite code",
-        },
-        500
-      );
+      if (workspace.inviteCode !== code) {
+        return c.json({ error: "Invalid invite code" }, 400);
+      }
+
+      await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
+        workspaceId,
+        userId: user.$id,
+        role: MemberRole.MEMBER,
+      });
+
+      return c.json({ data: workspace });
     }
-  });
+  );
 
 export default app;

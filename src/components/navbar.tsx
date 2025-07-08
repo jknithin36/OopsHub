@@ -3,8 +3,9 @@
 import React from "react";
 import { UserButton } from "@/features/auth/components/user-button";
 import MobileSidebar from "./mobile-sidebar";
-import { Bell, Search, Command, Sun, Plus } from "lucide-react";
+import { Bell, Search, Command, Sun } from "lucide-react";
 import WorkSpaceSwitcher from "./work-space-switcher";
+import { JoinWithInviteLinkDialog } from "@/features/workspaces/components/join-workspace";
 
 const SearchInput = () => (
   <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md border border-muted-foreground/20 text-sm focus-within:border-foreground transition">
@@ -36,22 +37,13 @@ const NotificationBell = () => (
   </button>
 );
 
-const InviteMembersButton = () => (
-  <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition">
-    <Plus className="w-4 h-4" />
-    Invite
-  </button>
-);
-
 export default function Navbar() {
   return (
     <nav className="sticky top-0 z-40 w-full bg-background border-b border-muted px-4 lg:px-6 py-3 flex items-center justify-between">
-      {/* 📱 Mobile Sidebar */}
       <div className="block lg:hidden">
         <MobileSidebar />
       </div>
 
-      {/* 🖥 Title & Subtitle (lg only) */}
       <div className="hidden lg:flex flex-col">
         <h1 className="text-2xl font-semibold text-foreground">Home</h1>
         <p className="text-sm text-muted-foreground">
@@ -60,14 +52,13 @@ export default function Navbar() {
         </p>
       </div>
 
-      {/* 🔗 Navbar Actions */}
       <div className="flex items-center gap-4 ml-auto">
-        <WorkSpaceSwitcher /> {/* ✅ Your real component */}
+        <WorkSpaceSwitcher />
         <SearchInput />
+        <JoinWithInviteLinkDialog />
         <CommandMenuTrigger />
         <ThemeToggle />
         <NotificationBell />
-        <InviteMembersButton />
         <UserButton />
       </div>
     </nav>
