@@ -6,7 +6,8 @@ import { error } from "console";
 import { Hono } from "hono";
 import { ID, Permission, Query, Role } from "node-appwrite";
 import { z } from "zod";
-import { createProjectSchema } from "../schema";
+import { createProjectSchema, updateProjectSchema } from "../schema";
+import { MemberRole } from "@/features/members/types";
 
 const app = new Hono();
 
@@ -156,6 +157,83 @@ app
 
       return c.json({ data: projects });
     }
-  );
+  )
+  .patch(
+    "/:projectId",
+    sessionMiddleware,
+    zValidator("form", updateProjectSchema),
+    async (c) => {
+      const projectId = c.req.param("projectId");
+      const { name, image, workspaceId } = c.req.valid("form");
+
+      const databases = c.get("databases");
+      const storage = c.get("storage");
+      const user = c.get("user");
+
+      const project = await databases.getDocument(
+        DATABASE_ID,
+        PROJECTS_ID,
+        projectId
+      );
+
+      const member = await getMember({
+        databases,
+        workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({ error: "Unauthorized" }, 403);
+      }
+
+      let uploadedImageId: string | null = null;
+      if (image instanceof File) {
+        const uploaded = await storage.createFile(
+          IMAGES_BUCKET_ID,
+          ID.unique(),
+          image,
+          [Permission.read(Role.any())]
+        );
+        uploadedImageId = uploaded?.$id ?? null;
+      }
+
+      const updated = await databases.updateDocument(
+        DATABASE_ID,
+        PROJECTS_ID,
+        projectId,
+        {
+          ...(name ? { name } : {}),
+          ...(uploadedImageId ? { imgUrl: uploadedImageId } : {}),
+        }
+      );
+
+      return c.json({ data: updated });
+    }
+  )
+  .delete("/:projectId", sessionMiddleware, async (c) => {
+    const { projectId } = c.req.param();
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const project = await databases.getDocument(
+      DATABASE_ID,
+      PROJECTS_ID,
+      projectId
+    );
+
+    const member = await getMember({
+      databases,
+      workspaceId: project.workspaceId,
+      userId: user.$id,
+    });
+
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json({ error: "Unauthorized" }, 403);
+    }
+
+    await databases.deleteDocument(DATABASE_ID, PROJECTS_ID, projectId);
+
+    return c.json({ data: { $id: projectId } });
+  });
 
 export default app;

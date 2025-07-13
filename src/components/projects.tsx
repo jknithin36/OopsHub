@@ -7,13 +7,15 @@ import { RiAddCircleFill } from "react-icons/ri";
 
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { useProjectModal } from "@/features/projects/hooks/use-create-project-modal"; // ✅ import modal hook
+import { useProjectModal } from "@/features/projects/hooks/use-create-project-modal";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getImageUrl } from "@/lib/get-image-url";
 
 const Projects = () => {
   const pathname = usePathname();
   const workspaceId = useWorkSpaceId();
   const { data } = useGetProjects(workspaceId);
-  const { open } = useProjectModal(); // ✅ get open function
+  const { open } = useProjectModal();
 
   return (
     <div className="space-y-2">
@@ -24,7 +26,7 @@ const Projects = () => {
         </p>
         <RiAddCircleFill
           className="size-5 text-muted-foreground hover:text-primary cursor-pointer"
-          onClick={open} // ✅ open modal on click
+          onClick={open}
         />
       </div>
 
@@ -33,6 +35,7 @@ const Projects = () => {
         {data?.documents?.map((project) => {
           const isActive =
             pathname === `/workspaces/${workspaceId}/projects/${project.$id}`;
+          const imageUrl = getImageUrl(project.imgUrl); // 🖼️ from Appwrite fileId
 
           return (
             <Link
@@ -44,7 +47,16 @@ const Projects = () => {
                   : "text-muted-foreground hover:bg-muted"
               }`}
             >
-              {project.name}
+              {/* Avatar */}
+              <Avatar className="h-5 w-5">
+                <AvatarImage src={imageUrl || undefined} alt={project.name} />
+                <AvatarFallback>
+                  {project.name?.slice(0, 2)?.toUpperCase() ?? "PR"}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* Project Name */}
+              <span className="truncate">{project.name}</span>
             </Link>
           );
         })}
