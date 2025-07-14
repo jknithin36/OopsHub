@@ -1,45 +1,59 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+type ProjectResponse = {
+  $id: string;
+  name: string;
+  workspaceId: string;
+  imgUrl?: string | null;
+};
 
 export const useCreateProject = (options?: {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (project: ProjectResponse) => void;
   onError?: (error: Error) => void;
 }) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
-  return useMutation({
-    mutationFn: async (formData: FormData) => {
+  return useMutation<ProjectResponse, Error, FormData>({
+    mutationFn: async (formData) => {
       const res = await fetch("/api/projects", {
         method: "POST",
         body: formData,
       });
 
-      const data = await res.json();
+      const result = await res.json();
 
-      if (!res.ok)
+      if (!res.ok) {
         throw new Error(
-          data?.error?.issues?.[0]?.message || "Failed to create project"
+          result?.error?.issues?.[0]?.message ||
+            result?.error?.message ||
+            "Failed to create project"
         );
+      }
 
-      return data;
+      return result.data as ProjectResponse;
     },
 
-    onSuccess: (data) => {
+    onSuccess: (project) => {
       toast.success("Project created!");
+
+      // ✅ Invalidate project list for that workspace
       queryClient.invalidateQueries({
-        queryKey: ["projects", data.data.workspaceId],
+        queryKey: ["projects", project.workspaceId],
       });
 
-      if (options?.onSuccess) {
-        options.onSuccess(data);
-      }
+      // ✅ Redirect to new project's page
+      router.push(`/workspaces/${project.workspaceId}/projects/${project.$id}`);
+
+      // ✅ Custom callback if needed
+      options?.onSuccess?.(project);
     },
 
     onError: (error) => {
       toast.error(error.message || "Failed to create project.");
-      if (options?.onError) {
-        options.onError(error);
-      }
+      options?.onError?.(error);
     },
   });
 };

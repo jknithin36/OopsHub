@@ -3,6 +3,8 @@ import { DeleteProjectButton } from "@/features/projects/components/delete-proje
 import { UpdateProjectForm } from "@/features/projects/components/edit-project-form";
 import { getProject } from "@/features/projects/queries";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 interface ProjectSettingsPageProps {
   params: {
@@ -19,6 +21,17 @@ const ProjectSettingsPage = async ({ params }: ProjectSettingsPageProps) => {
 
   return (
     <div className="max-w-2xl mx-auto py-12 space-y-10 px-4">
+      {/* Go Back Button */}
+      <div>
+        <Link
+          href={`/workspaces/${project.workspaceId}/projects/${project.$id}`}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Project
+        </Link>
+      </div>
+
       {/* General Settings */}
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-foreground">

@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useCreateProject } from "../api/use-create-project";
 import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(1, "Project name is required"),
@@ -29,6 +30,7 @@ interface Props {
 
 export const CreateProjectForm = ({ onCancel }: Props) => {
   const workspaceId = useWorkSpaceId();
+  const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
@@ -40,11 +42,14 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
   });
 
   const { mutate: createProject, isPending } = useCreateProject({
-    onSuccess: () => {
+    onSuccess: (project) => {
+      toast.success("Project created successfully!");
       form.reset();
       setPreview(null);
-      toast.success("Project created successfully!");
       onCancel?.();
+
+      // ✅ Redirect to the newly created project page
+      router.push(`/workspaces/${project.workspaceId}/projects/${project.$id}`);
     },
     onError: (error) => {
       toast.error(error.message || "Failed to create project.");
@@ -59,7 +64,7 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
 
     const formData = new FormData();
     formData.append("name", values.name);
-    formData.append("workspaceId", workspaceId); // ✅ Must be passed
+    formData.append("workspaceId", workspaceId);
     if (values.image) {
       formData.append("image", values.image);
     }
@@ -74,11 +79,6 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
       setPreview(URL.createObjectURL(file));
     }
   };
-
-  // Optional debug
-  useEffect(() => {
-    console.log("🧩 Current Workspace ID:", workspaceId);
-  }, [workspaceId]);
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
