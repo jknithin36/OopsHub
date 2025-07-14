@@ -16,6 +16,9 @@ import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 import { useGetTasks } from "../api/use-get-tasks";
 import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { useParams } from "next/navigation";
+import { DataTable } from "./data-table";
+import { columns } from "./columns";
+import { DataKanban } from "./data-kanban";
 
 const TaskViewSwitcher = () => {
   const { open } = useCreateTaskModal();
@@ -133,14 +136,14 @@ const TaskViewSwitcher = () => {
           <div className="text-sm text-muted-foreground">Loading tasks...</div>
         ) : (
           <div className="border rounded-lg p-4 text-sm text-muted-foreground">
-            {JSON.stringify(tasks)}
+            <DataTable columns={columns} data={tasks ?? []} />
           </div>
         )}
       </TabsContent>
 
       <TabsContent value="kanban">
         <div className="border rounded-lg p-4 text-sm text-muted-foreground">
-          Kanban View
+          <DataKanban data={tasks ?? []} />
         </div>
       </TabsContent>
 
