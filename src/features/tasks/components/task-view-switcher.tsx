@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LayoutList, Columns3, CalendarDays, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,11 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+
 import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 import { useGetTasks } from "../api/use-get-tasks";
+import { useUpdateManyTasks } from "../api/use-update-many-tasks"; // ✅ NEW
 import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { useParams } from "next/navigation";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { DataKanban } from "./data-kanban";
@@ -27,8 +28,9 @@ const TaskViewSwitcher = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const projectId = params?.projectId as string | undefined;
+  const updateManyTasks = useUpdateManyTasks(); // ✅ NEW
 
+  const projectId = params?.projectId as string | undefined;
   const status = searchParams.get("status") ?? undefined;
   const assigneeId = searchParams.get("assigneeId") ?? undefined;
   const dueDate = searchParams.get("dueDate") ?? undefined;
@@ -36,13 +38,11 @@ const TaskViewSwitcher = () => {
 
   const updateSearchParam = (key: string, value: string | undefined) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
-
     if (value) {
       current.set(key, value);
     } else {
       current.delete(key);
     }
-
     router.push(`?${current.toString()}`);
   };
 
@@ -102,7 +102,7 @@ const TaskViewSwitcher = () => {
                 <SelectValue placeholder="Filter by assignee" />
               </SelectTrigger>
               <SelectContent>
-                {/* Fill these dynamically if needed */}
+                {/* Replace with dynamic values if needed */}
                 <SelectItem value="user1">User 1</SelectItem>
                 <SelectItem value="user2">User 2</SelectItem>
               </SelectContent>
@@ -143,7 +143,10 @@ const TaskViewSwitcher = () => {
 
       <TabsContent value="kanban">
         <div className="border rounded-lg p-4 text-sm text-muted-foreground">
-          <DataKanban data={tasks ?? []} />
+          <DataKanban
+            data={tasks ?? []}
+            onChange={(updates) => updateManyTasks.mutate(updates)} // ✅ Hook connected
+          />
         </div>
       </TabsContent>
 

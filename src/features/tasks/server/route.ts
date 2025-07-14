@@ -301,6 +301,66 @@ const app = new Hono()
 
       return c.json({ task: updated }, 200);
     }
+  )
+  .post(
+    "/bulk-update",
+    sessionMiddleware,
+    zValidator(
+      "json",
+      z.object({
+        updates: z
+          .array(
+            z.object({
+              $id: z.string(),
+              status: z.nativeEnum(TaskStatus),
+              position: z.number(),
+            })
+          )
+          .min(1),
+      })
+    ),
+    async (c) => {
+      const user = c.get("user");
+      const databases = c.get("databases");
+      const { updates } = c.req.valid("json");
+
+      // Assume all updates belong to same workspace → validate first task
+      const firstTask = await databases.getDocument<Task>(
+        DATABASE_ID,
+        TASKS_ID,
+        updates[0].$id
+      );
+
+      const member = await getMember({
+        databases,
+        workspaceId: firstTask.workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      // Run updates in parallel
+      const results = await Promise.allSettled(
+        updates.map((update) =>
+          databases.updateDocument(DATABASE_ID, TASKS_ID, update.$id, {
+            status: update.status,
+            position: update.position,
+          })
+        )
+      );
+
+      const updated = results
+        .filter((r) => r.status === "fulfilled")
+        .map((r: any) => r.value);
+
+      const failed = results
+        .filter((r) => r.status === "rejected")
+        .map((r: any) => r.reason);
+
+      return c.json({ updated, failed }, 200);
+    }
   );
 
 export default app;
