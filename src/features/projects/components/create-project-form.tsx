@@ -81,15 +81,16 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
       {/* Project Name */}
-      <div className="space-y-2">
+      <div className="px-4 py-3 space-y-2">
         <Label htmlFor="name">Project Name</Label>
         <Input
           id="name"
           {...form.register("name")}
           disabled={isPending}
           placeholder="e.g. Marketing Website"
+          className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 rounded-md text-sm text-foreground"
         />
         {form.formState.errors.name && (
           <p className="text-sm text-red-500">
@@ -99,7 +100,7 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
       </div>
 
       {/* Image Upload */}
-      <div className="space-y-2">
+      <div className="px-4 py-3 space-y-2">
         <Label htmlFor="image">Project Icon (optional)</Label>
         <Input
           id="image"
@@ -107,6 +108,7 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
           accept="image/*"
           onChange={handleImageChange}
           disabled={isPending}
+          className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 rounded-md text-sm text-foreground"
         />
         {preview && (
           <Image
@@ -120,18 +122,23 @@ export const CreateProjectForm = ({ onCancel }: Props) => {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          Create
-        </Button>
+      <div className="flex justify-end gap-2 pt-4 px-4">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           onClick={onCancel}
           disabled={isPending}
+          className="px-2 py-1 rounded-md text-sm text-muted-foreground hover:bg-muted transition duration-200"
         >
           Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="px-2 py-1 rounded-md text-sm bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-400 dark:hover:bg-blue-300 transition duration-200"
+        >
+          {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          Create Project
         </Button>
       </div>
     </form>

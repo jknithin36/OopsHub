@@ -4,12 +4,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { ExternalLink, Pencil, Trash } from "lucide-react";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteTask } from "@/features/tasks/api/use-delete-task";
-import { useEditTaskModal } from "@/features/tasks/hooks/use-edit-task-modal"; // ✅ EDIT MODAL HOOK
+import { useEditTaskModal } from "@/features/tasks/hooks/use-edit-task-modal";
 import { useRouter } from "next/navigation";
 import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
@@ -34,7 +35,7 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
   );
 
   const { mutate: deleteTask, isPending } = useDeleteTask();
-  const { open } = useEditTaskModal(); // ✅ OPEN MODAL CONTEXT
+  const { open } = useEditTaskModal();
 
   const onOpenTask = () => {
     router.push(`/workspaces/${workspaceId}/tasks/${id}`);
@@ -51,58 +52,56 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
   };
 
   const handleEdit = () => {
-    open(id); // ✅ OPEN the edit modal with the task ID
+    open(id);
   };
 
   return (
     <>
       <ConfirmDialog />
-      <div className="flex justify-end">
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-48 rounded-md border bg-white p-1 shadow-md"
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="w-56 rounded-md border bg-background shadow-lg overflow-hidden"
+        >
+          <DropdownMenuItem
+            onClick={onOpenTask}
+            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
           >
-            {/* Task Details */}
-            <DropdownMenuItem
-              onClick={onOpenTask}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer"
-            >
-              <ExternalLink className="size-4 stroke-2" />
-              Task Details
-            </DropdownMenuItem>
+            <ExternalLink className="size-4" />
+            <span>Task Details</span>
+          </DropdownMenuItem>
 
-            {/* Edit Task */}
-            <DropdownMenuItem
-              onClick={handleEdit}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer"
-            >
-              <Pencil className="size-4 stroke-2" />
-              Edit Task
-            </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={handleEdit}
+            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
+          >
+            <Pencil className="size-4" />
+            <span>Edit Task</span>
+          </DropdownMenuItem>
 
-            {/* Open Project */}
-            <DropdownMenuItem
-              onClick={onOpenProject}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium cursor-pointer"
-            >
-              <ExternalLink className="size-4 stroke-2" />
-              Open Project
-            </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-muted/50" />
 
-            {/* Delete Task */}
-            <DropdownMenuItem
-              onClick={handleDelete}
-              disabled={isPending}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 cursor-pointer"
-            >
-              <Trash className="size-4 stroke-2" />
-              Delete Task
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          <DropdownMenuItem
+            onClick={onOpenProject}
+            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
+          >
+            <ExternalLink className="size-4" />
+            <span>Open Project</span>
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator className="bg-muted/50" />
+
+          <DropdownMenuItem
+            onClick={handleDelete}
+            disabled={isPending}
+            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-destructive/90 hover:text-destructive-foreground focus:bg-destructive/90 focus:text-destructive-foreground"
+          >
+            <Trash className="size-4" />
+            <span>Delete Task</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 };

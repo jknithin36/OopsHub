@@ -47,7 +47,12 @@ export const Navigation = () => {
     <ul className="flex flex-col space-y-1">
       {routes.map((item) => {
         const fullHref = `/workspaces/${workspaceId}${item.href}`;
-        const isActive = pathname === fullHref;
+
+        // ✅ Fix for home route activation
+        const isActive =
+          pathname === fullHref ||
+          (item.href === "/" && pathname === `/workspaces/${workspaceId}`);
+
         const Icon = isActive ? item.activeIcon : item.icon;
 
         return (

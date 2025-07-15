@@ -7,7 +7,7 @@ import { Loader } from "lucide-react";
 import { useParams } from "next/navigation";
 import { CreateTaskForm } from "./create-task-form";
 
-// ✅ Local safe hook to get workspaceId as string
+// Local safe hook to get workspaceId as string
 const useSafeWorkspaceId = (): string => {
   const params = useParams();
   const raw = (params as Record<string, string | string[]>)?.workspaceId;
@@ -26,15 +26,15 @@ export const CreateTaskFormWrapper = ({ onCancel }: CreateFormWrapperProps) => {
   // Show spinner if workspaceId not ready
   if (!workspaceId) {
     return (
-      <Card className="w-full h-[714px] border-none shadow-none">
+      <Card className="w-full h-[714px] border-gray-200 shadow-sm bg-white">
         <CardContent className="flex items-center justify-center h-full">
-          <Loader className="size-5 animate-spin text-muted-foreground" />
+          <Loader className="size-5 animate-spin text-blue-600" />
         </CardContent>
       </Card>
     );
   }
 
-  // ✅ Pass workspaceId as a string directly
+  // Pass workspaceId as a string directly
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects(
     workspaceId,
     { enabled: shouldFetch }
@@ -49,15 +49,15 @@ export const CreateTaskFormWrapper = ({ onCancel }: CreateFormWrapperProps) => {
 
   if (isLoading) {
     return (
-      <Card className="w-full h-[714px] border-none shadow-none">
+      <Card className="w-full h-[714px] border-gray-200 shadow-sm bg-white">
         <CardContent className="flex items-center justify-center h-full">
-          <Loader className="size-5 animate-spin text-muted-foreground" />
+          <Loader className="size-5 animate-spin text-blue-600" />
         </CardContent>
       </Card>
     );
   }
 
-  // ✅ SAFELY map data only if it’s an array
+  // SAFELY map data only if it’s an array
   const projectOptions = Array.isArray(projects?.documents)
     ? projects.documents.map((project) => ({
         id: project.$id,

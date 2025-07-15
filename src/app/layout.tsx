@@ -6,6 +6,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/query-provider";
 import { Toaster } from "sonner";
 import { ModalProvider } from "@/components/modal-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,10 +24,12 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={cn(inter.className, "antialiased min-h-screen")}>
-        <QueryProvider>
-          <Toaster />
-          <ModalProvider>{children}</ModalProvider>
-        </QueryProvider>
+        <TooltipProvider>
+          <QueryProvider>
+            <Toaster />
+            <ModalProvider>{children}</ModalProvider>
+          </QueryProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

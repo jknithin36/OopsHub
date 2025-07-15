@@ -4,60 +4,70 @@ import Image from "next/image";
 import Link from "next/link";
 import { Navigation } from "./navigation";
 import WorkSpace from "./workspace";
-import Projects from "./projects"; // ✅ Import your component
+import Projects from "./projects";
 
 export const Sidebar = () => {
   return (
-    <aside className="h-screen w-64 border-r border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col justify-between sticky top-0 left-0 shadow-sm z-50">
-      {/* 🔝 Top: Logo + Workspace Selector */}
-      <div className="px-4 py-5 border-b border-muted flex flex-col gap-2">
-        <Link href="/" className="flex items-center gap-2">
+    <aside className="h-screen w-64 bg-gray-50 dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700/50 flex flex-col justify-between sticky top-0 left-0 shadow-sm z-50 font-sans">
+      {/* 🔝 Top Section: Logo Only */}
+      <div className="px-4 py-6 space-y-5">
+        <Link
+          href="/"
+          className="flex justify-center hover:opacity-90 transition-all duration-200"
+        >
           <Image
             src="/navbar.png"
             alt="Oopshub Logo"
-            width={140}
-            height={40}
-            priority
-            className="object-contain"
+            width={132} // Increased from 40
+            height={132} // Increased from 40
           />
         </Link>
-        <span className="text-xs text-muted-foreground italic">
-          Work smarter with Oopshub
-        </span>
 
-        <div className="mt-3">
-          <WorkSpace />
-        </div>
+        <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100 leading-tight">
+          Start Your Day
+          <br />
+          <span className="text-blue-600 dark:text-blue-400">
+            Be Productive ✌️
+          </span>
+        </h2>
+
+        <WorkSpace />
       </div>
 
-      {/* 🔃 Middle: Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-        <Navigation />
-
-        {/* ✅ Insert Projects component here */}
-        <Projects />
-
-        {/* Feedback */}
-        <div className="px-3 py-3 rounded-lg border border-muted bg-muted/40 text-center text-xs text-muted-foreground space-y-1">
-          <p className="font-semibold text-sm text-foreground">
-            💬 Got feedback?
+      {/* 🧭 Main Navigation */}
+      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Menu
           </p>
-          <p>Help us improve Oopshub. We’re listening.</p>
+          <Navigation />
+        </div>
+
+        <div className="space-y-2">
+          <Projects />
+        </div>
+
+        {/* 💬 Feedback card */}
+        <div className="bg-white dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-850 rounded-lg border border-gray-200 dark:border-gray-700/50 px-4 py-5 text-center text-sm text-gray-600 dark:text-gray-300 space-y-2 hover:scale-[1.02] transition-transform duration-200">
+          <p className="font-semibold text-gray-900 dark:text-gray-100">
+            💬 Got Feedback?
+          </p>
+          <p>Help us improve Oopshub.</p>
           <Link
             href="mailto:insane414425@gmail.com"
-            className="inline-block mt-1 text-blue-600 font-medium hover:underline text-xs"
+            className="inline-block text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
           >
-            Send feedback →
+            Send Feedback →
           </Link>
         </div>
       </div>
 
-      {/* 🔻 Bottom Footer */}
-      <div className="px-4 py-4 border-t border-gray-200 dark:border-neutral-800 text-center text-xs text-muted-foreground">
-        <p className="mb-1 italic">Oops, work just got easier.</p>
+      {/* 🔻 Footer */}
+      <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-850 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="italic font-medium">Oops, work just got easier.</p>
         <Link
           href="https://www.linkedin.com/in/jknithin/"
-          className="text-blue-600 font-semibold hover:underline"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
           target="_blank"
           rel="noopener noreferrer"
         >

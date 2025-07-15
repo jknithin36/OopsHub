@@ -4,9 +4,6 @@ import { getWorkspaceById } from "@/features/workspaces/server/queries";
 import { UpdateWorkspaceForm } from "@/features/workspaces/components/edit-workspace-form";
 import { DeleteWorkspaceCard } from "@/features/workspaces/components/delete-workspace-button";
 import { ResetInviteCodeCard } from "@/features/workspaces/components/reset-invite-card";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 interface WorkspaceIdSettingsPageProps {
   params: { workspaceId: string };
@@ -22,42 +19,47 @@ const WorkspaceIdSettingsPage = async ({
   if (!workspace) redirect("/");
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 space-y-12">
-      <div className="mb-4">
-        <Link href="/" passHref>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2 text-sm text-muted-foreground"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Button>
-        </Link>
-      </div>
-
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            Workspace Settings
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Manage workspace details, invite code, and dangerous actions.
-          </p>
-        </div>
+    <div className="max-w-5xl mx-auto px-6 py-10 space-y-12">
+      {/* Page Header */}
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold text-foreground">
+          Workspace Settings
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Manage workspace details, invite access, and remove workspace.
+        </p>
       </header>
 
+      {/* General Section */}
       <section className="space-y-4">
-        <h2 className="text-lg font-medium text-foreground">General</h2>
+        <div>
+          <h2 className="text-lg font-medium text-foreground">General</h2>
+          <p className="text-sm text-muted-foreground">
+            Update workspace name and logo.
+          </p>
+        </div>
         <UpdateWorkspaceForm workspace={workspace} />
       </section>
 
+      {/* Invite Code Section */}
       <section className="space-y-4">
-        <h2 className="text-lg font-medium text-foreground">Invite Code</h2>
+        <div>
+          <h2 className="text-lg font-medium text-foreground">Invite Code</h2>
+          <p className="text-sm text-muted-foreground">
+            Share this code to invite members to the workspace.
+          </p>
+        </div>
         <ResetInviteCodeCard inviteCode={workspace.inviteCode} />
       </section>
 
+      {/* Danger Zone */}
       <section className="space-y-4">
-        <h2 className="text-lg font-medium text-destructive">Danger Zone</h2>
+        <div>
+          <h2 className="text-lg font-medium text-destructive">Danger Zone</h2>
+          <p className="text-sm text-muted-foreground">
+            Proceed with caution — this will permanently delete your workspace.
+          </p>
+        </div>
         <DeleteWorkspaceCard />
       </section>
     </div>
