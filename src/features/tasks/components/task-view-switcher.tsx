@@ -20,6 +20,7 @@ import { useWorkSpaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { DataKanban } from "./data-kanban";
+import DataCalendar from "./data-calendar";
 
 const TaskViewSwitcher = () => {
   const { open } = useCreateTaskModal();
@@ -152,7 +153,7 @@ const TaskViewSwitcher = () => {
 
       <TabsContent value="calendar">
         <div className="border rounded-lg p-4 text-sm text-muted-foreground">
-          Calendar View
+          <DataCalendar data={tasks ?? []} />
         </div>
       </TabsContent>
     </Tabs>
